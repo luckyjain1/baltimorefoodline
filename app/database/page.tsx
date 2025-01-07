@@ -1,28 +1,47 @@
-export default function Dashboard() {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6">
-        {/* Header */}
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Dashboard</h1>
-  
-        {/* Welcome Message */}
-        <p className="text-lg text-gray-600 mb-8">
-          Welcome to your dashboard! Here you can manage your SMS communications.
-        </p>
-  
-        {/* Placeholder for Actions */}
-        <div className="w-full max-w-md bg-white shadow-md rounded p-6">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">Send SMS</h2>
-          <p className="text-gray-500 mb-6">This is where the SMS form will go.</p>
-  
-          {/* Placeholder Buttons */}
-          <button className="w-full bg-blue-500 text-white py-2 rounded cursor-not-allowed">
-            Send SMS
-          </button>
-          <button className="w-full bg-gray-300 text-gray-600 py-2 mt-4 rounded cursor-not-allowed">
-            View Sent Messages
-          </button>
-        </div>
-      </div>
-    );
-  }
-  
+"use client";
+
+import { useEffect, useState } from "react";
+
+interface Pantry {
+  name: string;
+  location: string;
+  hours: string;
+  contact_number: string;
+}
+
+export default function DatabasePage() {
+  const [foodPantries, setFoodPantries] = useState<Pantry[]>([]);
+
+  useEffect(() => {
+    fetch('/api/food_pantries')
+      .then((res) => res.json())
+      .then((data) => setFoodPantries(data))
+      .catch((err) => console.error('Error fetching data:', err));
+  }, []);
+
+  return (
+    <div className="bg-indigo-50 p-8 min-h-screen">
+      <h1 className="text-3xl text-gray-900 font-bold mb-4 flex flex-col items-center">Food Pantry Database</h1>
+      <table className="border-collapse border border-gray-400 w-full">
+        <thead>
+          <tr className="bg-gray-200">
+            <th className="border border-gray-400 text-gray-900 p-2">Name</th>
+            <th className="border border-gray-400 text-gray-900 p-2">Location</th>
+            <th className="border border-gray-400 text-gray-900 p-2">Hours</th>
+            <th className="border border-gray-400 text-gray-900 p-2">Contact</th>
+          </tr>
+        </thead>
+        <tbody>
+          {foodPantries.map((pantry, index) => (
+            <tr key={index}>
+              <td className="border border-gray-400 bg-white text-gray-900 p-2">{pantry.name}</td>
+              <td className="border border-gray-400 bg-white text-gray-900 p-2">{pantry.location}</td>
+              <td className="border border-gray-400 bg-white text-gray-900 p-2">{pantry.hours}</td>
+              <td className="border border-gray-400 bg-white text-gray-900 p-2">{pantry.contact_number}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}

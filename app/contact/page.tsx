@@ -1,88 +1,114 @@
-"use client"; // Needed for client-side interactivity
-import React, { useState } from "react";
+"use client";
+
+import { useState } from "react";
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
+  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState("");
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setStatus("Sending...");
-
-    // Mock submission (replace with actual API endpoint)
-    setTimeout(() => {
-      setStatus("Message sent successfully!");
-    }, 2000);
+    e.preventDefault(); // Prevent the form from refreshing the page
+    setStatus("Submitting...");
+    
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+  
+      const result = await response.json();
+  
+      if (response.ok) {
+        setStatus("Message sent successfully!");
+        setFormData({ name: "", email: "", message: "" }); // Reset the form
+      } else {
+        setStatus(`Error: ${result.error}`);
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus("Error: Failed to submit the form");
+    }
   };
+  
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Contact Us</h1>
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-md bg-white shadow-md rounded p-6"
-      >
-        <div className="mb-4">
-          <label htmlFor="name" className="block text-gray-700 font-medium mb-2">
-            Name
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            placeholder="Your Name"
-            className="w-full border rounded px-4 py-2"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-gray-700 font-medium mb-2">
-            Email
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
-            placeholder="Your Email"
-            className="w-full border rounded px-4 py-2"
-            required
-          />
-        </div>
-        <div className="mb-6">
-          <label htmlFor="message" className="block text-gray-700 font-medium mb-2">
-            Message
-          </label>
-          <textarea
-            id="message"
-            name="message"
-            value={formData.message}
-            onChange={handleInputChange}
-            placeholder="Your Message"
-            className="w-full border rounded px-4 py-2"
-            rows={4}
-            required
-          ></textarea>
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
-        >
-          Send Message
-        </button>
-      </form>
-      {status && <p className="mt-4 text-gray-600">{status}</p>}
-    </div>
-  );
-}
+    <div className="bg-indigo-50 p-8 min-h-screen flex flex-col items-center">
+      <h1 className="text-3xl font-bold text-gray-900 mb-4">Contact Us</h1>
+      <form onSubmit={handleSubmit} className="mb-8">
+      <label className="block text-gray-900 mb-2">
+             Name:
+             <input
+               type="text"
+               name="name"
+               value={formData.name}
+               onChange={handleChange}
+               className="border border-gray-300 p-2 w-full"
+               placeholder="Enter your name"
+               required
+             />
+           </label>
+           <label className="block text-gray-900 mb-2">
+             Email:
+             <input
+               type="email"
+               name="email"
+               value={formData.email}
+               onChange={handleChange}
+               className="border border-gray-300 p-2 w-full"
+               placeholder="Enter your email"
+               required
+             />
+           </label>
+           <label className="block text-gray-900 mb-2">
+             Message:
+             <textarea
+               name="message"
+               value={formData.message}
+               onChange={handleChange}
+               className="border border-gray-300 p-2 w-full"
+               placeholder="Enter your message"
+               rows={5}
+               required
+             ></textarea>
+           </label>
+           <button
+             type="submit"
+             className="bg-blue-500 text-white p-2 rounded mt-2"
+           >
+             Submit
+           </button>
+         </form>
+
+         {/* Display form submission status */}
+         {status && (
+           <div
+             className={`p-2 rounded ${
+               status.startsWith("Error") ? "bg-red-200 text-red-800" : "bg-green-200 text-green-800"
+             }`}
+           >
+             {status}
+           </div>
+         )}
+
+         <footer className="text-center text-gray-600 text-sm mt-8">
+           For more information, please email us at{" "}
+           <a
+             href="mailto:baltimorefoodline@gmail.com"
+             className="text-blue-500"
+           >
+             baltimorefoodline@gmail.com
+           </a>
+           .
+           <br />
+           Baltimore Foodline - Helping the community one meal at a time.
+         </footer>
+       </div>
+     );
+   }
+
