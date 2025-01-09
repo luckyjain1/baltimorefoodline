@@ -2,42 +2,47 @@
 
 import { useEffect, useState } from "react";
 
-interface Pantry {
-  name: string;
-  location: string;
-  hours: string;
-  contact_number: string;
-}
-
 export default function DatabasePage() {
+  
+  type Pantry = {
+    id: string;
+    name: string;
+    location: string;
+    hours: string;
+    other: string;
+  };
+
   const [foodPantries, setFoodPantries] = useState<Pantry[]>([]);
 
   useEffect(() => {
-    fetch('/api/food_pantries')
-      .then((res) => res.json())
+    fetch("/api/food_pantries")
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+        return res.json();
+      })
       .then((data) => setFoodPantries(data))
-      .catch((err) => console.error('Error fetching data:', err));
+      .catch((err) => console.error("Error fetching data:", err));
   }, []);
 
   return (
-    <div className="bg-indigo-50 p-8 min-h-screen">
-      <h1 className="text-3xl text-gray-900 font-bold mb-4 flex flex-col items-center">Food Pantry Database</h1>
-      <table className="border-collapse border border-gray-400 w-full">
+    <div className="container">
+      <h1 className="page-title">Food Pantry Database</h1>
+      <table className="table">
         <thead>
-          <tr className="bg-gray-200">
-            <th className="border border-gray-400 text-gray-900 p-2">Name</th>
-            <th className="border border-gray-400 text-gray-900 p-2">Location</th>
-            <th className="border border-gray-400 text-gray-900 p-2">Hours</th>
-            <th className="border border-gray-400 text-gray-900 p-2">Contact</th>
+          <tr>
+            <th>Name</th>
+            <th>Location</th>
+            <th>Hours</th>
+            <th>Other</th>
           </tr>
         </thead>
         <tbody>
-          {foodPantries.map((pantry, index) => (
-            <tr key={index}>
-              <td className="border border-gray-400 bg-white text-gray-900 p-2">{pantry.name}</td>
-              <td className="border border-gray-400 bg-white text-gray-900 p-2">{pantry.location}</td>
-              <td className="border border-gray-400 bg-white text-gray-900 p-2">{pantry.hours}</td>
-              <td className="border border-gray-400 bg-white text-gray-900 p-2">{pantry.contact_number}</td>
+          {foodPantries.map((pantry) => (
+            <tr key={pantry.id}>
+              <td>{pantry.name || "N/A"}</td>
+              <td>{pantry.location || "N/A"}</td>
+              <td>{pantry.hours || "N/A"}</td>
+              <td>{pantry.other || "N/A"}</td>
             </tr>
           ))}
         </tbody>

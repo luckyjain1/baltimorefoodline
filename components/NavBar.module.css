@@ -1,0 +1,45 @@
+/* NavBar.module.css */
+
+/* Navbar Styling */
+
+  .navbar {
+    background-color: #E8F5E9; /* Green-50 equivalent */
+    padding: 1rem 0;
+  }
+  
+  .navContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px; /* Ensure content stays centered */
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  
+  .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1B5E20; /* Indigo-600 equivalent */
+  }
+  
+  .logo a {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .navLinks {
+    display: flex;
+    gap: 1.5rem; /* Space between navigation links */
+  }
+  
+  .navItem {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #374151; /* Gray-800 equivalent */
+    text-decoration: none;
+  }
+  
+  .navItem:hover {
+    text-decoration: underline;
+    color: #1e3a8a; /* Indigo-700 equivalent for hover */
+  }

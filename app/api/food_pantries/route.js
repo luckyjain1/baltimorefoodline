@@ -1,10 +1,11 @@
-import db from '../../../utils/db';
+import { getFoodPantries } from "@/utils/firestore";
 
 export async function GET() {
   try {
-    const [rows] = await db.query('SELECT * FROM food_pantries');
-    return new Response(JSON.stringify(rows), { status: 200 });
-  } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+    const foodPantries = await getFoodPantries();
+    return new Response(JSON.stringify(foodPantries), { status: 200 });
+  } catch (error) {
+    console.error("Error fetching food pantries:", error);
+    return new Response("Failed to fetch food pantries", { status: 500 });
   }
 }

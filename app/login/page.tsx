@@ -13,59 +13,52 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="bg-indigo-50 min-h-screen flex flex-col items-center justify-center text-gray-700">
+    <div className="container">
       {/* Login Form */}
-      <div className="w-full max-w-sm bg-white shadow-md rounded-lg p-6 mb-6">
-        <h1 className="text-2xl font-bold text-center mb-6">Login</h1>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <h1 className="page-title">Login</h1>
+        <form onSubmit={handleSubmit} className="form">
           {/* Email Input */}
-          <label className="flex flex-col">
+          <label className="form-label">
             Email:
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="border p-2 rounded w-full"
+              className="form-input"
               placeholder="Enter your email"
               required
             />
           </label>
 
           {/* Password Input */}
-          <label className="flex flex-col">
+          <label className="form-label">
             Password:
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="border p-2 rounded w-full"
+              className="form-input"
               placeholder="Enter your password"
               required
             />
           </label>
 
+          <a href="/password_reset" className="link">
+            Forgot password?
+          </a>
+
           {/* Submit Button */}
-          <button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
+          <button type="submit" className="btn">
             Login
           </button>
         </form>
-      </div>
 
-      {/* Partner With Us Section */}
-      <div className="text-center">
-        <p className="text-gray-700 mb-4">
+        <p className="body">
           Interested in partnering with us? We would love to hear from you!
         </p>
-        <a
-          href="/contact"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
+        <a href="/contact" className="btn btn-green">
           Partner With Us
         </a>
       </div>
-    </div>
   );
 }
