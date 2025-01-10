@@ -1,10 +1,29 @@
 "use client"; // Required for client-side interactivity in Next.js
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { auth } from "@/utils/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function DashboardPage() {
   const [basicInfo, setBasicInfo] = useState("");
   const [message, setMessage] = useState("");
+  const [userId, setUserId] = useState<string | null>(null); // Store user ID for testing
+
+  const router = useRouter();
+
+  useEffect(() => {
+    // Redirect to login if user is not authenticated
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserId(user.uid); // Save the user ID
+      } else {
+        router.push("/login"); // Redirect to login if not authenticated
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router]);
 
   const handleBasicInfoSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,7 +37,7 @@ export default function DashboardPage() {
 
   return (
     <div className="bg-indigo-50 min-h-screen p-8 flex flex-col items-center gap-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-4">Dashboard</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-4">Dashboard- {userId}</h1>
 
       {/* Section for Updating Basic Info */}
       <div className="w-full max-w-md">
