@@ -17,7 +17,7 @@ export async function POST(req) {
       service: 'gmail',
       auth: {
         user: 'baltimorefoodline@gmail.com', // Your Gmail address
-        pass: 'your-app-password',   // Your app-specific password
+        pass: 'xsxl gvxr gxmb fqvk',   // Your app-specific password
       },
     });
 
