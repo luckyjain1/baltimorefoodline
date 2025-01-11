@@ -1,7 +1,7 @@
 "use client"; // For client-side interactivity
 
 import { useState } from "react";
-import { signInWithEmailAndPassword, setPersistence, browserLocalPersistence, browserSessionPersistence } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/utils/firebase";
 import { useRouter } from "next/navigation";
 import { FirebaseError } from "firebase/app";
