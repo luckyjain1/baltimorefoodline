@@ -57,7 +57,7 @@ export default function Navbar() {
           { user && (
             <button
               onClick={handleSignOut}
-              className="hover:text-gray-400 border border-white px-2 rounded"
+              className="hover:text-gray-400 border border-white px-2 rounded" // replace with whatever format for button
             >
               Sign Out
             </button>

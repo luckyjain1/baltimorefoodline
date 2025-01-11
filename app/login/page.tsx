@@ -1,7 +1,7 @@
 "use client"; // For client-side interactivity
 
 import { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, setPersistence, browserLocalPersistence, browserSessionPersistence } from "firebase/auth";
 import { auth } from "@/utils/firebase";
 import { useRouter } from "next/navigation";
 import { FirebaseError } from "firebase/app";
@@ -35,13 +35,13 @@ export default function LoginPage() {
           default:
             setError("An unknown error occurred:" + error.message); // Replace in final with something else?
         }
+      } else {
+        setError("An unknown error occurred.");
       }
     } finally {
       setLoading(false);
     }
   };
-
-  
 
   return (
     <div className="container">

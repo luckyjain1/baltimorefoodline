@@ -1,14 +1,25 @@
 "use client"; // For client-side interactivity
 
 import { useState } from "react";
+import { sendPasswordResetEmail } from "firebase/auth";
+import { auth } from "@/utils/firebase"
 
 export default function PasswordResetPage() {
     const [email, setEmail] = useState("");
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        alert(`Email: ${email}`);
-        // Replace the alert with an API call for authentication
+        
+        sendPasswordResetEmail(auth, email)
+        .then(() => {
+          // Pop up: Password reset email sent!
+          alert("A password reset email has been sent.");
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          alert("An unknown error has occured: " + error.message);
+        });
     };
 
     return (
