@@ -6,7 +6,6 @@ export default function DatabasePage() {
   
   type Pantry = {
     id: string;
-    name: string;
     location: string;
     hours: string;
     other: string;
@@ -26,7 +25,7 @@ export default function DatabasePage() {
 
   return (
     <div className="container">
-      <h1 className="page-title">Food Pantry Database</h1>
+      <h1 className="page-title">Food Pantries in Baltimore</h1>
       <table className="table">
         <thead>
           <tr>
@@ -39,7 +38,7 @@ export default function DatabasePage() {
         <tbody>
           {foodPantries.map((pantry) => (
             <tr key={pantry.id}>
-              <td>{pantry.name || "N/A"}</td>
+              <td>{pantry.id || "N/A"}</td>
               <td>{pantry.location || "N/A"}</td>
               <td>{pantry.hours || "N/A"}</td>
               <td>{pantry.other || "N/A"}</td>
