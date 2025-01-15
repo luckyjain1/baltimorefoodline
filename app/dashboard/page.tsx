@@ -9,6 +9,7 @@ export default function DashboardPage() {
   const [basicInfo, setBasicInfo] = useState("");
   const [message, setMessage] = useState("");
   const [userId, setUserId] = useState<string | null>(null); // Store user ID for testing
+  //const [newPassword, setNewPassword] = useState(""); // for changing password
 
   const router = useRouter();
 

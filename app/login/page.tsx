@@ -23,7 +23,10 @@ export default function LoginPage() {
     
     // Try to sign in with email and password
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password);
+      // For testing
+      // const isNewUser = getAdditionalUserInfo(user)?.isNewUser;
+      // alert(isNewUser);
       // If succesful, redirect to dashboard
       router.push("/dashboard");
     } catch (error) {
