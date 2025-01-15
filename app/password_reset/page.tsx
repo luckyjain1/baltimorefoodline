@@ -16,8 +16,8 @@ export default function PasswordResetPage() {
           alert("A password reset email has been sent.");
         })
         .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
+          //const errorCode = error.code;
+          //const errorMessage = error.message;
           alert("An unknown error has occured: " + error.message);
         });
     };

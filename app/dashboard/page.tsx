@@ -3,13 +3,14 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { auth } from "@/utils/firebase";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, validatePassword, updatePassword } from "firebase/auth";
 
 export default function DashboardPage() {
   const [basicInfo, setBasicInfo] = useState("");
   const [message, setMessage] = useState("");
   const [userId, setUserId] = useState<string | null>(null); // Store user ID for testing
-  //const [newPassword, setNewPassword] = useState(""); // for changing password
+  const [newPassword, setNewPassword] = useState(""); // for changing password
+  const [error, setError] = useState("");
 
   const router = useRouter();
 
@@ -35,6 +36,57 @@ export default function DashboardPage() {
     e.preventDefault();
     alert(`Message Sent: ${message}`);
   };
+
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    // First, validate password and only actually submit it if it's valid
+    const status = await validatePassword(auth, newPassword);
+    if (status.isValid) {
+      if (auth.currentUser != null) {
+        updatePassword(auth.currentUser, newPassword).then(() => {
+          // Update successful.
+          setNewPassword("");
+          alert("Password updated succesfully.");
+        }).catch((error) => {
+          switch (error) {
+            case "auth/requires-recent-login":
+              // Handle reauthentication
+              setError("TO-DO: Need a recent login.");
+              break;
+            default:
+              setError("An unknown error occured: " + error.message);
+          }
+        });
+      } else {
+        // The user is not signed in
+        router.push("/login");
+      }
+      
+    } else {
+      // Password is not valid, we should show an error explaining why.
+      const notLongEnough = status.meetsMinPasswordLength !== true;
+      const tooLong = status.meetsMaxPasswordLength !== true;
+      const needsLowerCase = status.containsLowercaseLetter !== true;
+      const needsUpperCase = status.containsUppercaseLetter !== true;
+      const needsSpecialCharacter = status.containsNonAlphanumericCharacter !== true;
+      const needsNumber = status.containsNumericCharacter !== true;
+
+      if (notLongEnough) {
+        setError("Your password must contain at least " + status.passwordPolicy.customStrengthOptions.minPasswordLength + " characters.");
+      } else if (tooLong) {
+        setError("Your password cannot exceed " + status.passwordPolicy.customStrengthOptions.maxPasswordLength + " characters.");
+      } else if (needsLowerCase) {
+        setError("Your password must contain at least one lowercase character.");
+      } else if (needsUpperCase) {
+        setError("Your password must contain at least one uppercase character.");
+      } else if (needsSpecialCharacter) {
+        setError("Your password must contain at least one special character.");
+      } else if (needsNumber) {
+        setError("Your password must contain at least one number.");
+      }
+    }
+  }
 
   return (
     <div className="bg-indigo-50 min-h-screen p-8 flex flex-col items-center gap-8">
@@ -65,6 +117,23 @@ export default function DashboardPage() {
         />
         <button type="submit" className="btn btn-green">
           Send Message
+        </button>
+      </form>
+
+      {/* Section for Updating Password */}
+      <h2 className="section-title">Update Password</h2>
+      <form onSubmit={handlePasswordSubmit} className="form">
+        <input
+          className="form-textarea"
+          type="password"
+          placeholder="Enter your new password here..."
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          required
+        />
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        <button type="submit" className="btn btn-green">
+          Update Password
         </button>
       </form>
     </div>
