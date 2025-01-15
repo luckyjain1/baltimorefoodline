@@ -44,7 +44,7 @@ export default function Navbar() {
             About
           </Link>
           <Link href="/database" className={styles.navItem}>
-            Database
+            Food Pantries
           </Link>
           <Link href="/contact" className={styles.navItem}>
             Contact
