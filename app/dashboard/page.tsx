@@ -2,13 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { auth } from "@/utils/firebase";
+import { auth, db } from "@/utils/firebase";
 import { onAuthStateChanged, validatePassword, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
+import EditableProfileInformation from "@/components/EditableProfileInformation";
+import { doc, DocumentReference, getDoc, updateDoc } from "firebase/firestore";
 
 export default function DashboardPage() {
-  const [basicInfo, setBasicInfo] = useState("");
+  // Profile Information
+  const [uid, setUID] = useState("");
+  const [name, setName] = useState("");
+  const [hours, setHours] = useState("");
+  const [location, setLocation] = useState("");
+  const [otherInfo, setOtherInfo] = useState("");
+  // Sending a message through twilio
   const [message, setMessage] = useState("");
-  const [userId, setUserId] = useState<string | null>(null); // Store user ID for testing
+  // Updating Password
   const [oldPassword, setOldPassword] = useState(""); // for changing password; reauthentication
   const [newPassword, setNewPassword] = useState(""); // for changing password
   const [error, setError] = useState("");
@@ -17,9 +25,19 @@ export default function DashboardPage() {
 
   useEffect(() => {
     // Redirect to login if user is not authenticated
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUserId(user.uid); // Save the user ID
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) { 
+        // Now we should populate the profile information
+        setUID(user.uid);
+        const docRef = (doc(db, "food_pantries", user.uid));
+        const docSnap = await getDoc(docRef!);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setName(data.name);
+          setHours(data.hours);
+          setLocation(data.location);
+          setOtherInfo(data.other);
+        }
       } else {
         router.push("/login"); // Redirect to login if not authenticated
       }
@@ -28,9 +46,28 @@ export default function DashboardPage() {
     return () => unsubscribe();
   }, [router]);
 
-  const handleBasicInfoSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert(`Basic Info Updated: ${basicInfo}`);
+  const handleHoursSubmit = async (newValue: string) => {
+    const docRef = (doc(db, "food_pantries", uid));
+    await updateDoc(docRef, {
+      hours: newValue
+    });
+    alert(`Hours Succesfully Updated: ${newValue}`);
+  };
+
+  const handleLocationSubmit = async (newValue: string) => {
+    const docRef = (doc(db, "food_pantries", uid));
+    await updateDoc(docRef, {
+      location: newValue
+    });
+    alert(`Location Succesfully Updated: ${newValue}`);
+  };
+
+  const handleOtherInfoSubmit = async (newValue: string) => {
+    const docRef = (doc(db, "food_pantries", uid));
+    await updateDoc(docRef, {
+      other: newValue
+    });
+    alert(`Other Information Succesfully Updated: ${newValue}`);
   };
 
   const handleMessageSubmit = (e: React.FormEvent) => {
@@ -105,21 +142,29 @@ export default function DashboardPage() {
 
   return (
     <div className="bg-indigo-50 min-h-screen p-8 flex flex-col items-center gap-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-4">Dashboard- {userId}</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-4">Dashboard- {name}</h1>
 
-      {/* Section for Updating Basic Info */}
-      <h2 className="section-title">Update Basic Info</h2>
-      <form onSubmit={handleBasicInfoSubmit} className="form">
-        <textarea
-          className="form-textarea"
-          placeholder="Enter basic information here..."
-          value={basicInfo}
-          onChange={(e) => setBasicInfo(e.target.value)}
-        />
-        <button type="submit" className="btn">
-          Update Info
-        </button>
-      </form>
+      {/* Section for Updating Profile Info */}
+      <h2 className="section-title">Hours</h2>
+      <EditableProfileInformation
+        info={hours}
+        setInfo={setHours}
+        onSubmit={(newValue : string) => handleHoursSubmit(newValue)}
+      />
+
+      <h2 className="section-title">Location</h2>
+      <EditableProfileInformation
+        info={location}
+        setInfo={setLocation}
+        onSubmit={(newValue : string) => handleLocationSubmit(newValue)}
+      />
+
+      <h2 className="section-title">Other Information</h2>
+      <EditableProfileInformation
+        info={otherInfo}
+        setInfo={setOtherInfo}
+        onSubmit={(newValue : string) => handleOtherInfoSubmit(newValue)}
+      />
 
       {/* Section for Sending a Message */}
       <h2 className="section-title">Send Message</h2>

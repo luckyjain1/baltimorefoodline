@@ -63,6 +63,11 @@ ul {
   background-color: #10b981;
 }
 
+.button-group {
+  display: flex;
+  gap: 0.5rem; /* Adds space between buttons */
+}
+
 /* Title Styling */
 
 .page-title {
