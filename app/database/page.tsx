@@ -6,7 +6,8 @@ export default function DatabasePage() {
   
   type Pantry = {
     id: string;
-    location: string;
+    name: string;
+    address: string;
     hours: string;
     other: string;
   };
@@ -14,12 +15,15 @@ export default function DatabasePage() {
   const [foodPantries, setFoodPantries] = useState<Pantry[]>([]);
 
   useEffect(() => {
-    fetch("/api/food_pantries")
+    fetch("./api/food_pantries")
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
         return res.json();
       })
-      .then((data) => setFoodPantries(data))
+      .then((data) => {
+        console.log("Fetched data:", data);
+        setFoodPantries(data);
+      }) 
       .catch((err) => console.error("Error fetching data:", err));
   }, []);
 
@@ -38,8 +42,8 @@ export default function DatabasePage() {
         <tbody>
           {foodPantries.map((pantry) => (
             <tr key={pantry.id}>
-              <td>{pantry.id || "N/A"}</td>
-              <td>{pantry.location || "N/A"}</td>
+              <td>{pantry.name || "N/A"}</td>
+              <td>{pantry.address || "N/A"}</td>
               <td>{pantry.hours || "N/A"}</td>
               <td>{pantry.other || "N/A"}</td>
             </tr>
