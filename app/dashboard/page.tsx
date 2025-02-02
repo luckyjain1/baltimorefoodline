@@ -12,7 +12,7 @@ export default function DashboardPage() {
   const [uid, setUID] = useState("");
   const [name, setName] = useState("");
   const [hours, setHours] = useState("");
-  const [location, setLocation] = useState("");
+  const [address, setAddress] = useState("");
   const [otherInfo, setOtherInfo] = useState("");
   // Sending a message through twilio
   const [message, setMessage] = useState("");
@@ -35,7 +35,7 @@ export default function DashboardPage() {
           const data = docSnap.data();
           setName(data.name);
           setHours(data.hours);
-          setLocation(data.location);
+          setAddress(data.address);
           setOtherInfo(data.other);
         }
       } else {
@@ -57,9 +57,9 @@ export default function DashboardPage() {
   const handleLocationSubmit = async (newValue: string) => {
     const docRef = (doc(db, "food_pantries", uid));
     await updateDoc(docRef, {
-      location: newValue
+      address: newValue
     });
-    alert(`Location Succesfully Updated: ${newValue}`);
+    alert(`Address Succesfully Updated: ${newValue}`);
   };
 
   const handleOtherInfoSubmit = async (newValue: string) => {
@@ -154,8 +154,8 @@ export default function DashboardPage() {
 
       <h2 className="section-title">Location</h2>
       <EditableProfileInformation
-        info={location}
-        setInfo={setLocation}
+        info={address}
+        setInfo={setAddress}
         onSubmit={(newValue : string) => handleLocationSubmit(newValue)}
       />
 
