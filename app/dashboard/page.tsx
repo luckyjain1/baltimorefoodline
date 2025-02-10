@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { auth, db } from "@/utils/firebase";
 import { onAuthStateChanged, validatePassword, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import EditableProfileInformation from "@/components/EditableProfileInformation";
-import { doc, DocumentReference, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 export default function DashboardPage() {
   // Profile Information
@@ -84,7 +84,7 @@ export default function DashboardPage() {
         auth.currentUser.email!,
         oldPassword
       )
-      reauthenticateWithCredential(auth.currentUser, credential).then(async (result) => {
+      reauthenticateWithCredential(auth.currentUser, credential).then(async () => {
         //Password entered is correct
         // Next, validate password and only actually submit it if it's valid
         const status = await validatePassword(auth, newPassword);
@@ -95,13 +95,10 @@ export default function DashboardPage() {
             setOldPassword("");
             alert("Password updated succesfully.");
           }).catch((error) => {
-            switch (error) {
-              case "auth/requires-recent-login":
-                // Handle reauthentication
-                setError("Reauthentication needed");
-                break;
-              default:
-                setError("An unknown error occured: " + error.message);
+            if (error.code === "auth/requires-recent-login") {
+              setError("Reauthentication needed");
+            } else {
+              setError("An unknown error occurred: " + (error.message || "Unknown issue"));
             }
           });
           
@@ -129,7 +126,7 @@ export default function DashboardPage() {
           }
         }
      })
-     .catch((error) => {
+     .catch(() => {
         //Incorrect password or some other error
         setError("The old password you entered is not correct.");
      });

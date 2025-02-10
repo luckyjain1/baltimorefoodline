@@ -3,10 +3,14 @@
 // Displays some profile information as text with an edit button
 // When the edit button is pressed, changes to an input and a submit/cancel button
 
-import { FormEventHandler, useState } from "react";
+import { useState } from "react";
 
 // Takes in: the variable (the info), the vars setter, and the submit function
-const EditableProfileInformation = (props: { info: string; setInfo: Function; onSubmit: Function; }) => {
+const EditableProfileInformation = (props: { 
+    info: string; 
+    setInfo: (value: string) => void; 
+    onSubmit: (value: string) => void; 
+}) => {
     const { info, setInfo, onSubmit } = props;
 
     const [editing, setEditing] = useState(false);
