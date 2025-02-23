@@ -3,34 +3,34 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { auth, db } from "@/utils/firebase";
-import { onAuthStateChanged, validatePassword, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
+import { onAuthStateChanged, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import EditableProfileInformation from "@/components/EditableProfileInformation";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { Container, Typography, TextField, Button, Paper, Grid, Snackbar, Alert, CircularProgress } from "@mui/material";
 
 export default function DashboardPage() {
-  // Profile Information
   const [uid, setUID] = useState("");
   const [name, setName] = useState("");
   const [hours, setHours] = useState("");
   const [address, setAddress] = useState("");
   const [otherInfo, setOtherInfo] = useState("");
-  // Sending a message through twilio
   const [message, setMessage] = useState("");
-  // Updating Password
-  const [oldPassword, setOldPassword] = useState(""); // for changing password; reauthentication
-  const [newPassword, setNewPassword] = useState(""); // for changing password
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
 
   const router = useRouter();
 
   useEffect(() => {
-    // Redirect to login if user is not authenticated
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) { 
-        // Now we should populate the profile information
         setUID(user.uid);
-        const docRef = (doc(db, "food_pantries", user.uid));
-        const docSnap = await getDoc(docRef!);
+        const docRef = doc(db, "food_pantries", user.uid);
+        const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const data = docSnap.data();
           setName(data.name);
@@ -39,168 +39,132 @@ export default function DashboardPage() {
           setOtherInfo(data.other);
         }
       } else {
-        router.push("/login"); // Redirect to login if not authenticated
+        router.push("/login");
       }
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, [router]);
 
-  const handleHoursSubmit = async (newValue: string) => {
-    const docRef = (doc(db, "food_pantries", uid));
-    await updateDoc(docRef, {
-      hours: newValue
-    });
-    alert(`Hours Succesfully Updated: ${newValue}`);
-  };
-
-  const handleLocationSubmit = async (newValue: string) => {
-    const docRef = (doc(db, "food_pantries", uid));
-    await updateDoc(docRef, {
-      address: newValue
-    });
-    alert(`Address Succesfully Updated: ${newValue}`);
-  };
-
-  const handleOtherInfoSubmit = async (newValue: string) => {
-    const docRef = (doc(db, "food_pantries", uid));
-    await updateDoc(docRef, {
-      other: newValue
-    });
-    alert(`Other Information Succesfully Updated: ${newValue}`);
+  const handleUpdate = async (field: string, value: string) => {
+    try {
+      const docRef = doc(db, "food_pantries", uid);
+      await updateDoc(docRef, { [field]: value });
+      setSnackbarMessage(`${field} updated successfully!`);
+      setSnackbarSeverity("success");
+      setOpenSnackbar(true);
+    } catch (error) {
+      setSnackbarMessage(`Failed to update ${field}.`);
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
+    }
   };
 
   const handleMessageSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert(`Message Sent: ${message}`);
+    setSnackbarMessage(`Message Sent: ${message}`);
+    setSnackbarSeverity("success");
+    setOpenSnackbar(true);
+    setMessage("");
   };
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (auth.currentUser) {
-      // First, check that the old password is correct
-      const credential = EmailAuthProvider.credential(
-        auth.currentUser.email!,
-        oldPassword
-      )
-      reauthenticateWithCredential(auth.currentUser, credential).then(async () => {
-        //Password entered is correct
-        // Next, validate password and only actually submit it if it's valid
-        const status = await validatePassword(auth, newPassword);
-        if (status.isValid) {
-          updatePassword(auth.currentUser!, newPassword).then(() => {
-            // Update successful.
-            setNewPassword("");
-            setOldPassword("");
-            alert("Password updated succesfully.");
-          }).catch((error) => {
-            if (error.code === "auth/requires-recent-login") {
-              setError("Reauthentication needed");
-            } else {
-              setError("An unknown error occurred: " + (error.message || "Unknown issue"));
-            }
-          });
-          
-        } else {
-          // Password is not valid, we should show an error explaining why.
-          const notLongEnough = status.meetsMinPasswordLength !== true;
-          const tooLong = status.meetsMaxPasswordLength !== true;
-          const needsLowerCase = status.containsLowercaseLetter !== true;
-          const needsUpperCase = status.containsUppercaseLetter !== true;
-          const needsSpecialCharacter = status.containsNonAlphanumericCharacter !== true;
-          const needsNumber = status.containsNumericCharacter !== true;
 
-          if (notLongEnough) {
-            setError("Your password must contain at least " + status.passwordPolicy.customStrengthOptions.minPasswordLength + " characters.");
-          } else if (tooLong) {
-            setError("Your password cannot exceed " + status.passwordPolicy.customStrengthOptions.maxPasswordLength + " characters.");
-          } else if (needsLowerCase) {
-            setError("Your password must contain at least one lowercase character.");
-          } else if (needsUpperCase) {
-            setError("Your password must contain at least one uppercase character.");
-          } else if (needsSpecialCharacter) {
-            setError("Your password must contain at least one special character.");
-          } else if (needsNumber) {
-            setError("Your password must contain at least one number.");
-          }
-        }
-     })
-     .catch(() => {
-        //Incorrect password or some other error
-        setError("The old password you entered is not correct.");
-     });
-    }
-    else {
-      // The user is not signed in
+    if (auth.currentUser) {
+      try {
+        const credential = EmailAuthProvider.credential(auth.currentUser.email!, oldPassword);
+        await reauthenticateWithCredential(auth.currentUser, credential);
+        await updatePassword(auth.currentUser, newPassword);
+        setSnackbarMessage("Password updated successfully!");
+        setSnackbarSeverity("success");
+        setOpenSnackbar(true);
+        setNewPassword("");
+        setOldPassword("");
+      } catch (error) {
+        setError("Failed to update password. Please check your credentials.");
+      }
+    } else {
       router.push("/login");
     }
-  }
+  };
+
+  if (loading) return <CircularProgress sx={{ display: "block", mx: "auto", my: 4 }} />;
 
   return (
-    <div className="bg-indigo-50 min-h-screen p-8 flex flex-col items-center gap-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-4">Dashboard- {name}</h1>
+    <Container maxWidth="md" sx={{ mt: 6 }}>
+      <Typography variant="h4" fontWeight="bold" gutterBottom>
+        Welcome, {name}!
+      </Typography>
 
-      {/* Section for Updating Profile Info */}
-      <h2 className="section-title">Hours</h2>
-      <EditableProfileInformation
-        info={hours}
-        setInfo={setHours}
-        onSubmit={(newValue : string) => handleHoursSubmit(newValue)}
-      />
+      {/* Profile Update Section */}
+      <Paper sx={{ p: 4, my: 3 }}>
+        <Typography variant="h5" fontWeight="bold" gutterBottom>Profile Information</Typography>
+        <EditableProfileInformation info={hours} setInfo={setHours} onSubmit={(val) => handleUpdate("hours", val)} />
+        <EditableProfileInformation info={address} setInfo={setAddress} onSubmit={(val) => handleUpdate("address", val)} />
+        <EditableProfileInformation info={otherInfo} setInfo={setOtherInfo} onSubmit={(val) => handleUpdate("other", val)} />
+      </Paper>
 
-      <h2 className="section-title">Location</h2>
-      <EditableProfileInformation
-        info={address}
-        setInfo={setAddress}
-        onSubmit={(newValue : string) => handleLocationSubmit(newValue)}
-      />
+      {/* Send Message Section */}
+      <Paper sx={{ p: 4, my: 3 }}>
+        <Typography variant="h5" fontWeight="bold" gutterBottom>Send Message</Typography>
+        <form onSubmit={handleMessageSubmit}>
+          <TextField
+            fullWidth
+            label="Enter your message here..."
+            multiline
+            rows={4}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+          <Button type="submit" variant="contained" color="primary">
+            Send Message
+          </Button>
+        </form>
+      </Paper>
 
-      <h2 className="section-title">Other Information</h2>
-      <EditableProfileInformation
-        info={otherInfo}
-        setInfo={setOtherInfo}
-        onSubmit={(newValue : string) => handleOtherInfoSubmit(newValue)}
-      />
+      {/* Update Password Section */}
+      <Paper sx={{ p: 4, my: 3 }}>
+        <Typography variant="h5" fontWeight="bold" gutterBottom>Update Password</Typography>
+        <form onSubmit={handlePasswordSubmit}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                type="password"
+                label="Old Password"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                type="password"
+                label="New Password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+              />
+            </Grid>
+          </Grid>
+          {error && <Alert severity="error" sx={{ my: 2 }}>{error}</Alert>}
+          <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
+            Update Password
+          </Button>
+        </form>
+      </Paper>
 
-      {/* Section for Sending a Message */}
-      <h2 className="section-title">Send Message</h2>
-      <form onSubmit={handleMessageSubmit} className="form">
-        <textarea
-          className="form-textarea"
-          placeholder="Enter your message here..."
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        />
-        <button type="submit" className="btn btn-green">
-          Send Message
-        </button>
-      </form>
-
-      {/* Section for Updating Password */}
-      <h2 className="section-title">Update Password</h2>
-      <form onSubmit={handlePasswordSubmit} className="form">
-        <input
-          className="form-textarea"
-          type="password"
-          placeholder="Enter your old password"
-          value={oldPassword}
-          onChange={(e) => setOldPassword(e.target.value)}
-          required
-        />
-        <input
-          className="form-textarea"
-          type="password"
-          placeholder="Enter your new password here..."
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          required
-        />
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <button type="submit" className="btn btn-green">
-          Update Password
-        </button>
-      </form>
-    </div>
+      {/* Snackbar Notifications */}
+      <Snackbar open={openSnackbar} autoHideDuration={4000} onClose={() => setOpenSnackbar(false)}>
+        <Alert severity={snackbarSeverity} onClose={() => setOpenSnackbar(false)}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+    </Container>
   );
 }

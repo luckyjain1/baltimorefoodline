@@ -1,33 +1,28 @@
-"use client"; // For client-side interactivity
+"use client"; // Required for client-side interactivity
 
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/utils/firebase";
 import { useRouter } from "next/navigation";
 import { FirebaseError } from "firebase/app";
+import { Container, Box, TextField, Button, Typography, Link, CircularProgress, Snackbar, Alert } from "@mui/material";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const router = useRouter();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Make the loading spinner appear in case this takes a while
     setLoading(true);
     setError("");
-    
-    // Try to sign in with email and password
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // For testing
-      // const isNewUser = getAdditionalUserInfo(user)?.isNewUser;
-      // alert(isNewUser);
-      // If succesful, redirect to dashboard
       router.push("/dashboard");
     } catch (error) {
       if (error instanceof FirebaseError) {
@@ -36,95 +31,73 @@ export default function LoginPage() {
             setError("The username or password you entered is incorrect.");
             break;
           default:
-            setError("An unknown error occurred:" + error.message); // Replace in final with something else?
+            setError("An unknown error occurred: " + error.message);
         }
       } else {
         setError("An unknown error occurred.");
       }
+      setOpenSnackbar(true);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="container">
-      {/* Login Form */}
-        <h1 className="page-title">Login</h1>
-        <form onSubmit={handleSignIn} className="form">
+    <Container maxWidth="sm">
+      <Box sx={{ mt: 8, textAlign: "center" }}>
+        <Typography variant="h4" fontWeight="bold" gutterBottom>
+          Login
+        </Typography>
+
+        <Box component="form" onSubmit={handleSignIn} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           {/* Email Input */}
-          <label className="form-label">
-            Email:
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="form-input"
-              placeholder="Enter your email"
-              required
-            />
-          </label>
+          <TextField
+            label="Email"
+            variant="outlined"
+            fullWidth
+            required
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
           {/* Password Input */}
-          <label className="form-label">
-            Password:
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="form-input"
-              placeholder="Enter your password"
-              required
-            />
-          </label>
+          <TextField
+            label="Password"
+            variant="outlined"
+            fullWidth
+            required
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-          <a href="/password_reset" className="link">
+          {/* Forgot Password */}
+          <Link href="/password_reset" underline="hover" sx={{ alignSelf: "flex-end" }}>
             Forgot password?
-          </a>
-
-          {error && <p style={{ color: "red" }}>{error}</p>}
+          </Link>
 
           {/* Submit Button */}
+          <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
+            {loading ? <CircularProgress size={24} sx={{ color: "white" }} /> : "Login"}
+          </Button>
+        </Box>
 
-          <button
-            type="submit"
-            className={`btn ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-            disabled={loading}
-          >
-            {loading ? (
-              <span className="inline-flex items-center">
-                <svg
-                  className="animate-spin h-5 w-5 text-white mr-2"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C3.58 0 0 5.58 0 12h4z"
-                  ></path>
-                </svg>
-              </span>
-            ) : (
-              "Login"
-            )}
-          </button>
-        </form>
+        {/* Error Snackbar */}
+        <Snackbar open={openSnackbar} autoHideDuration={4000} onClose={() => setOpenSnackbar(false)}>
+          <Alert severity="error" onClose={() => setOpenSnackbar(false)}>
+            {error}
+          </Alert>
+        </Snackbar>
 
-        <p className="body">
+        {/* Partner Section */}
+        <Typography variant="body1" sx={{ mt: 4 }}>
           Interested in partnering with us? We would love to hear from you!
-        </p>
-        <a href="/contact" className="btn btn-green">
+        </Typography>
+        <Button href="/contact" variant="contained" color="success" sx={{ mt: 2 }}>
           Partner With Us
-        </a>
-      </div>
+        </Button>
+      </Box>
+    </Container>
   );
 }
