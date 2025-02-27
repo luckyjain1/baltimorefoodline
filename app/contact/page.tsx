@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { Box, Container, TextField, Button, Typography, Grid, Snackbar, Alert } from "@mui/material";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState<{ message: string, type: "success" | "error" | "" }>({ message: "", type: "" });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -12,8 +14,8 @@ export default function ContactPage() {
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Prevent the form from refreshing the page
-    setStatus("Submitting...");
+    e.preventDefault();
+    setLoading(true);
     
     try {
       const response = await fetch("/api/contact", {
@@ -21,82 +23,74 @@ export default function ContactPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-  
+
       const result = await response.json();
-  
+
       if (response.ok) {
-        setStatus("Message sent successfully!");
-        setFormData({ name: "", email: "", message: "" }); // Reset the form
+        setStatus({ message: "Message sent successfully!", type: "success" });
+        setFormData({ name: "", email: "", message: "" }); // Reset form
       } else {
-        setStatus(`Error: ${result.error}`);
+        setStatus({ message: `Error: ${result.error}`, type: "error" });
       }
     } catch (err) {
       console.error(err);
-      setStatus("Error: Failed to submit the form");
+      setStatus({ message: "Error: Failed to submit the form", type: "error" });
+    } finally {
+      setLoading(false);
     }
   };
+
   return (
-    <div className="container">
-      <h1 className="page-title">Contact Us</h1>
+    <Container maxWidth="sm" sx={{ mt: 8 }}>
+      <Typography variant="h4" fontWeight="bold" gutterBottom textAlign="center">
+        Contact Us
+      </Typography>
+      <Typography variant="body1" color="text.secondary" textAlign="center" sx={{ mb: 4 }}>
+        Have a question or want to get in touch? Fill out the form below.
+      </Typography>
 
-      <form onSubmit={handleSubmit} className="form">
-        <label className="form-label">
-          Name:
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            className="form-input"
-            placeholder="Enter your name"
-            required
-          />
-        </label>
-        <label className="form-label">
-          Email:
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="form-input"
-            placeholder="Enter your email"
-            required
-          />
-        </label>
-        <label className="form-label">
-          Message:
-          <textarea
-            name="message"
-            value={formData.message}
-            onChange={handleChange}
-            className="form-textarea"
-            placeholder="Enter your message"
-            rows={5}
-            required
-          ></textarea>
-        </label>
-        <button type="submit" className="btn">
-          Submit
-        </button>
-      </form>
+      <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <TextField
+          label="Name"
+          variant="outlined"
+          fullWidth
+          required
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+        />
+        <TextField
+          label="Email"
+          variant="outlined"
+          fullWidth
+          required
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+        />
+        <TextField
+          label="Message"
+          variant="outlined"
+          fullWidth
+          required
+          name="message"
+          multiline
+          rows={4}
+          value={formData.message}
+          onChange={handleChange}
+        />
+        <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
+          {loading ? "Sending..." : "Send Message"}
+        </Button>
+      </Box>
 
-      {status && (
-        <div className={`status ${status.startsWith("Error") ? "status-error" : "status-success"}`}>
-          {status}
-        </div>
-      )}
-
-      <div className="body">
-        For more information, please email us at{" "}
-        <a href="mailto:baltimorefoodline@gmail.com" className="link">
-          baltimorefoodline@gmail.com
-        </a>
-        .
-        <br />
-        Baltimore Foodline - Helping the community one meal at a time.
-      </div>
-    </div>
+      {/* Snackbar for success/error message */}
+      <Snackbar open={!!status.message} autoHideDuration={4000} onClose={() => setStatus({ message: "", type: "" })}>
+        <Alert onClose={() => setStatus({ message: "", type: "" })}>
+          {status.message}
+        </Alert>
+      </Snackbar>
+    </Container>
   );
 }
-  

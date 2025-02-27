@@ -5,7 +5,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "@/utils/firebase";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import styles from "./NavBar.module.css"
+import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
 
 export default function Navbar() {
   const [user, setUser] = useState(null);
@@ -25,50 +25,45 @@ export default function Navbar() {
     await signOut(auth);
     setUser(null);
     router.push("/login");
-  }
+  };
 
   return (
-    <nav className={styles.navbar}>
-      <div className={styles.navContainer}>
+    <AppBar position="static" sx={{ bgcolor: "primary.main" }}>
+      <Toolbar>
         {/* Logo */}
-        <div className={styles.logo}>
-          <Link href="/">Baltimore Foodline</Link>
-        </div>
+        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+          <Link href="/" style={{ textDecoration: "none", color: "white" }}>
+            Baltimore Foodline
+          </Link>
+        </Typography>
 
         {/* Navigation Links */}
-        <div className={styles.navLinks}>
-          <Link href="/" className={styles.navItem}>
+        <Box sx={{ display: "flex", gap: 2 }}>
+          <Button color="inherit" component={Link} href="/">
             Home
-          </Link>
-          <Link href="/about" className={styles.navItem}>
-            About
-          </Link>
-          <Link href="/database" className={styles.navItem}>
+          </Button>
+          <Button color="inherit" component={Link} href="/database">
             Food Pantries
-          </Link>
-          <Link href="/contact" className={styles.navItem}>
+          </Button>
+          <Button color="inherit" component={Link} href="/contact">
             Contact
-          </Link>
-          { user && (
-            <Link href="/dashboard" className={styles.navItem}>
+          </Button>
+          {user && (
+            <Button color="inherit" component={Link} href="/dashboard">
               Dashboard
-            </Link>
+            </Button>
           )}
-          { user && (
-            <button
-              onClick={handleSignOut}
-              className="hover:text-gray-400 border border-white px-2 rounded" // replace with whatever format for button
-            >
+          {user ? (
+            <Button color="inherit" onClick={handleSignOut}>
               Sign Out
-            </button>
-          )}
-          { !user && (
-            <Link href="/login" className={styles.navItem}>
+            </Button>
+          ) : (
+            <Button color="inherit" component={Link} href="/login">
               Log In
-            </Link>
+            </Button>
           )}
-        </div>
-      </div>
-    </nav>
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 }
