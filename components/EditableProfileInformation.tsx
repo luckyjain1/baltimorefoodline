@@ -1,5 +1,7 @@
 "use-client";
 
+import { Typography, TextField, Button, Box, } from "@mui/material";
+
 // Displays some profile information as text with an edit button
 // When the edit button is pressed, changes to an input and a submit/cancel button
 
@@ -29,40 +31,44 @@ const EditableProfileInformation = (props: {
 
     if (editing) {
         return (
-            <form onSubmit={(e) => {
-                e.preventDefault();
-                setInfo(tempInfo);
-                onSubmit(tempInfo);
-                setEditing(false);
-              }} 
-            className="form">
-                <textarea
-                className="form-textarea"
-                placeholder="Your info here..."
+        <Box sx={{ mb: 4 }}>
+            <TextField
+                fullWidth
+                multiline
                 value={tempInfo}
                 onChange={(e) => setTempInfo(e.target.value)}
-                />
-                <div className="button-group">
-                <button type="submit" className="btn">
-                    Confirm
-                </button>
-                <button type="button" className="btn" onClick={exitEditing}>
-                    Cancel
-                </button>
-                </div>
-            </form>
+                autoFocus
+                sx={{ mb: 2, fontSize: "1.25rem" }} 
+                InputProps={{ sx: { fontSize: "1.25rem" } }} 
+            />
+                <Box sx={{ display: "flex", gap: 2 }}>
+                    <Button 
+                        variant="contained" 
+                        color="primary" 
+                        onClick={() => { setInfo(tempInfo); onSubmit(tempInfo); setEditing(false); }}
+                    >
+                        Save
+                    </Button>
+                    <Button variant="outlined" color="secondary" onClick={exitEditing}>
+                        Cancel
+                    </Button>
+                </Box>
+            </Box>
         );
     } else {
         return (
-            <form onSubmit={enterEditing} className="form">
-                <p>{info}</p>
-                <button type="submit" className="btn">
-                Edit
-                </button>
-            </form>
-        )
+            <Box sx={{ mb: 4 }}>
+                <Typography sx={{ fontSize: "1.25rem"}}>{info}</Typography>
+                <Button 
+                    variant="text" 
+                    onClick={enterEditing} 
+                    sx={{ textTransform: "none", fontWeight: "bold", color: "primary.main", mt: 1,  }}
+                >
+                    Edit
+                </Button>
+            </Box>
+        );
     }
-    
 }
 
 export default EditableProfileInformation;
