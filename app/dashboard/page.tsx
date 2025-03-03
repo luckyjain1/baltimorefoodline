@@ -61,13 +61,46 @@ export default function DashboardPage() {
     }
   };
 
-  const handleMessageSubmit = (e: React.FormEvent) => {
+  const handleMessageSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSnackbarMessage(`Message Sent: ${message}`);
-    setSnackbarSeverity("success");
-    setOpenSnackbar(true);
-    setMessage("");
+  
+    try {
+      if (auth.currentUser) {
+        const docRef = doc(db, "food_pantries", auth.currentUser.uid);
+        const docSnap = await getDoc(docRef);
+  
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          const subscribers: string[] = data.subscribers;
+          const pantryName: string = data.name;
+  
+          const response = await fetch("/api/twilioSendMessage", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ subscribers, pantryName, message }),
+          });
+  
+          const result = await response.json();
+  
+          if (response.ok) {
+            setSnackbarMessage(`Message Sent Successfully: ${message}`);
+            setSnackbarSeverity("success");
+          } else {
+            setSnackbarMessage(`Error: ${result.error}`);
+            setSnackbarSeverity("error");
+          }
+  
+          setOpenSnackbar(true);
+          setMessage("");
+        }
+      }
+    } catch (error) {
+      setSnackbarMessage(`An error occurred while trying to send the message.`);
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
+    }
   };
+  
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
