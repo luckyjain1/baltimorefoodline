@@ -31,34 +31,37 @@ export default function Navbar() {
     <AppBar position="static" sx={{ bgcolor: "primary.main" }}>
       <Toolbar>
         {/* Logo */}
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+        <Typography variant="h5" fontWeight="bold" sx={{ flexGrow: 1 }}>
           <Link href="/" style={{ textDecoration: "none", color: "white" }}>
             Baltimore Foodline
           </Link>
         </Typography>
 
         {/* Navigation Links */}
-        <Box sx={{ display: "flex", gap: 2 }}>
-          <Button color="inherit" component={Link} href="/">
+        <Box sx={{ display: "flex", gap: 4 }}>
+          <Button color="inherit" component={Link} href="/" sx={{ fontWeight: "bold", textTransform: "none" }}>
             Home
           </Button>
-          <Button color="inherit" component={Link} href="/database">
+          <Button color="inherit" component={Link} href="/about" sx={{ fontWeight: "bold", textTransform: "none" }}>
+            About
+          </Button>
+          <Button color="inherit" component={Link} href="/database" sx={{ fontWeight: "bold", textTransform: "none" }}>
             Food Pantries
           </Button>
-          <Button color="inherit" component={Link} href="/contact">
+          <Button color="inherit" component={Link} href="/contact" sx={{ fontWeight: "bold", textTransform: "none" }}>
             Contact
           </Button>
           {user && (
-            <Button color="inherit" component={Link} href="/dashboard">
+            <Button color="inherit" component={Link} href="/dashboard" sx={{ fontWeight: "bold", textTransform: "none" }}>
               Dashboard
             </Button>
           )}
           {user ? (
-            <Button color="inherit" onClick={handleSignOut}>
+            <Button color="inherit" onClick={handleSignOut} sx={{ fontWeight: "bold", textTransform: "none" }}>
               Sign Out
             </Button>
           ) : (
-            <Button color="inherit" component={Link} href="/login">
+            <Button color="inherit" component={Link} href="/login" sx={{ fontWeight: "bold", textTransform: "none" }}>
               Log In
             </Button>
           )}

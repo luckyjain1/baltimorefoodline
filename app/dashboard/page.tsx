@@ -1,4 +1,4 @@
-"use client"; // Required for client-side interactivity in Next.js
+"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -55,6 +55,7 @@ export default function DashboardPage() {
       setSnackbarSeverity("success");
       setOpenSnackbar(true);
     } catch (error) {
+      console.error("Error updating document:", error);
       setSnackbarMessage(`Failed to update ${field}.`);
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
@@ -118,6 +119,7 @@ export default function DashboardPage() {
         setOldPassword("");
       } catch (error) {
         setError("Failed to update password. Please check your credentials.");
+        console.error("Error updating document:", error);
       }
     } else {
       router.push("/login");

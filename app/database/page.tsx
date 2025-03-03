@@ -36,7 +36,7 @@ export default function DatabasePage() {
 
   return (
     <Container maxWidth="md" sx={{ mt: 6 }}>
-      <Typography variant="h4" fontWeight="bold" gutterBottom>
+      <Typography variant="h4" fontWeight="bold" textAlign="center" gutterBottom>
         Food Pantries in Baltimore
       </Typography>
 

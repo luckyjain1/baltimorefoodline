@@ -1,31 +1,31 @@
 "use client";
 
-import { Box, Container, Typography, Button, Grid, List, ListItem, ListItemIcon } from "@mui/material";
+import { Box, Container, Typography, Button, Grid, /* List, ListItem, ListItemIcon */ } from "@mui/material";
 import Image from "next/image";
 
 export default function HomePage() {
 
-  const foodPantries = [
+  /* const foodPantries = [
     "Helping Hands Pantry",
     "Baltimore Community Pantry",
     "Hunger Relief Center",
     "St. Vincent’s Food Bank",
     "Hope & Nourish Initiative",
-  ];
+  ]; */
 
   return (
     <Box>
       {/* Hero Section */}
-      <Container sx={{ mt: 12 }}>
-        <Grid container spacing={4} alignItems="center">
+      <Container sx={{ mt: 20 }}>
+        <Grid container spacing={20} alignItems="center">
           {/* Left Content */}
           <Grid item xs={12} md={6}>
             <Typography variant="h3" fontWeight="bold" color="primary" gutterBottom>
               Find a Food Pantry Near You
             </Typography>
             <Typography variant="h6" color="text.secondary" paragraph>
-              Text your zipcode to XXX-XXX-XXXX to see food pantries near you, or HELP for instructions 
-              on subscribing to real-time updates about food resources in your area!
+              Text your zipcode to XXX-XXX-XXXX to get real-time updates from food pantries near you{/*, or HELP for instructions 
+              on subscribing to real-time updates about food resources in your area*/}!
             </Typography>
             <Button 
               variant="contained" 
@@ -41,15 +41,15 @@ export default function HomePage() {
             <Image 
               src="/cover_image.jpg" 
               alt="Cover Image" 
-              width={500} 
-              height={300} 
+              width={600} 
+              height={360} 
               style={{ borderRadius: "8px" }} 
             />
           </Grid>
         </Grid>
       </Container>
 
-      {/* Mission Section */}
+      {/* Mission Section 
       <Box sx={{ bgcolor: "primary.main", color: "white", py: 6, mt: 8 }}>
         <Container>
           <Grid container spacing={4} alignItems="center">
@@ -65,9 +65,9 @@ export default function HomePage() {
             </Grid>
           </Grid>
         </Container>
-      </Box>
+      </Box> */}
 
-      {/* Our Partners Section */}
+      {/* Our Partners Section 
       <Box sx={{ py: 6, mt: 4 }}>
         <Container maxWidth="md">
           <Typography variant="h4" fontWeight="bold" textAlign="center" gutterBottom>
@@ -79,9 +79,9 @@ export default function HomePage() {
                 <Typography variant="body1">{pantry}</Typography>
               </ListItem>
             ))}
-          </List>
+          </List> */}
 
-          {/* Partner With Us Button - Now Below the List */}
+          {/* Partner With Us Button - Now Below the List 
           <Box sx={{ textAlign: "center", mt: 2 }}>
             <Button 
               variant="contained" 
@@ -91,16 +91,16 @@ export default function HomePage() {
             </Button>
           </Box>
         </Container>
-      </Box>
+      </Box> */}
 
-      {/* Footnote Section */}
+      {/* Footnote Section 
       <Box sx={{ mt: 12, py: 4, bgcolor: "#f4f4f4", textAlign: "center" }}>
         <Typography variant="body2" color="text.secondary">
           Created by Shreya, Megan, and Lucky in collaboration with 
            Volunteers for Medical Engineering and Doctors Without Borders at 
           Johns Hopkins University.
         </Typography>
-      </Box>
-    </Box>
+      </Box> */}
+    </Box> 
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Box, Container, TextField, Button, Typography, Grid, Snackbar, Alert } from "@mui/material";
+import { Box, Container, TextField, Button, Typography, Snackbar, Alert } from "@mui/material";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
