@@ -8,12 +8,12 @@ The Baltimore Foodline is a platform designed to improve access to food resource
 - Search for food resources by zip code.
 - Pantries can send updates such as closures or special events.
 
-This project is built using **Node.js**, **Next.js**, **Vercel**, and **MySQL**.
+This project is built using **Node.js**, **Next.js**, and **Vercel**.
 
 ---
 
 ## Features
-- **Home Page:** Displays the mission statement and information about the platform.
+- **Home Page:** Displays basic information about the platform.
 - **About Page:** Includes partner information.
 - **Contact Page:** A form for new food pantries to sign up.
 - **Dashboard:** Allows food pantries to update their info and send messages.
@@ -28,17 +28,8 @@ Ensure you have the following installed:
 
 1. **Node.js** (v18.x or higher)
    - [Download Node.js](https://nodejs.org/)
-2. **MySQL**
-   - Install MySQL:
-     ```bash
-     # MacOS
-     brew install mysql
 
-     # Ubuntu
-     sudo apt install mysql-server
-     ```
-
-3. **Vercel CLI** (optional, for deployment)
+2. **Vercel CLI** (optional, for deployment)
    - Install Vercel CLI:
      ```bash
      npm install -g vercel
