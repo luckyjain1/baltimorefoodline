@@ -67,7 +67,8 @@ export default function DashboardPage() {
   
     try {
       if (auth.currentUser) {
-        const docRef = doc(db, "food_pantries", auth.currentUser.uid);
+        const uid = auth.currentUser.uid;
+        const docRef = doc(db, "food_pantries", uid);
         const docSnap = await getDoc(docRef);
   
         if (docSnap.exists()) {
@@ -78,7 +79,7 @@ export default function DashboardPage() {
           const response = await fetch("/api/twilioSendMessage", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ subscribers, pantryName, message }),
+            body: JSON.stringify({ subscribers, pantryName, message, uid }),
           });
   
           const result = await response.json();
