@@ -13,29 +13,24 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No subscribers provided" }, { status: 400 });
     }
 
-    const body = `${pantryName} has sent a message: \n\n${message}\n\nReply with "UNSUBSCRIBE" if you would like to stop receiving messages from ${pantryName}.`;
+    const body = `${pantryName} has sent a message: \n\n${message}\n\nReply "U" if you would like to stop receiving messages from ${pantryName}.`;
 
-    // Use Promise.all to ensure all messages are sent
-    const sendMessages = subscribers.map(async (number) => {
-      try {
-        // Send message using Twilio Studio flow
-        await client.studio.v2
-          .flows(process.env.NEXT_PUBLIC_TWILIO_SUBSCRIBER_FLOW!)
-          .executions.create({
-            from: process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER!,
-            parameters: {
-              message: body,
-              subscription_id: pantryID
-            },
-            to: number,
-          });
-      } catch (error) {
-        console.error(`Error sending message to ${number}:`, error);
-      }
-    });
-
-    // Wait for all message sending to complete
+    const sendMessages = subscribers.map((number) =>
+      client.studio.v2
+        .flows(process.env.NEXT_PUBLIC_TWILIO_SUBSCRIBER_FLOW!)
+        .executions.create({
+          from: process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER!,
+          parameters: {
+            "message": body,
+            "subscription_id": pantryID,
+          },
+          to: number,
+        })
+        .then((execution) => console.log(`Flow started for ${number}:`, execution.sid))
+        .catch((error) => console.error(`Error sending to ${number}:`, error))
+    );
     await Promise.all(sendMessages);
+    
 
     return NextResponse.json({ success: true, message: "Messages sent successfully!" }, { status: 200 });
   } catch (error: any) {
