@@ -7,11 +7,22 @@ const client = twilio(accountSid, authToken);
 
 export async function POST(req: Request) {
   try {
-    const { subscribers, pantryName, message, pantryID } = await req.json();
+    const { subscribers, pantryName, message, uid } = await req.json();
 
     if (!subscribers || !Array.isArray(subscribers)) {
       return NextResponse.json({ error: "No subscribers provided" }, { status: 400 });
     }
+
+    if (!uid) {
+      return NextResponse.json({ error: "No subscription ID provided" }, { status: 400 });
+    }
+
+    console.log("Sending messages with parameters:", {
+      from: process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER!,
+      flow: process.env.NEXT_PUBLIC_TWILIO_SUBSCRIBER_FLOW!,
+      subscription_id: uid,
+    });    
+    
 
     const body = `${pantryName} has sent a message: \n\n${message}\n\nReply "U" if you would like to stop receiving messages from ${pantryName}.`;
 
@@ -22,7 +33,7 @@ export async function POST(req: Request) {
           from: process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER!,
           parameters: {
             "message": body,
-            "subscription_id": pantryID,
+            "subscription_id": uid,
           },
           to: number,
         })
