@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, JSX } from "react";
 import { useRouter } from "next/navigation";
 import { auth, db } from "@/utils/firebase";
 import { onAuthStateChanged, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import EditableProfileInformation from "@/components/EditableProfileInformation";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { Container, Typography, TextField, Button, Paper, Grid, Snackbar, Alert, CircularProgress } from "@mui/material";
+import { Container, Typography, TextField, Button, Paper, Grid, Snackbar, Alert, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FilledTextFieldProps, OutlinedTextFieldProps, StandardTextFieldProps, TextFieldVariants } from "@mui/material";
+import { DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 export default function DashboardPage() {
   const [uid, setUID] = useState("");
@@ -22,6 +24,10 @@ export default function DashboardPage() {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
+  const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false);
+  const [scheduledTime, setScheduledTime] = useState<Date | null>(new Date());
+  const [scheduleError, setScheduleError] = useState<string>("");
+
 
   const router = useRouter();
 
@@ -102,7 +108,6 @@ export default function DashboardPage() {
       setOpenSnackbar(true);
     }
   };
-  
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,6 +131,53 @@ export default function DashboardPage() {
       router.push("/login");
     }
   };
+
+  const handleOpenScheduleDialog = () => {
+    const now = new Date();
+    const defaultTime = new Date(now.getTime() + 10 * 60 * 1000); // default 10 mins ahead
+    setScheduledTime(defaultTime);
+    setScheduleError("");
+    setScheduleDialogOpen(true);
+  };
+
+  const handleScheduleMessageSubmit = async () => {
+    try {
+      if (auth.currentUser) {
+        const uid = auth.currentUser.uid;
+        const docRef = doc(db, "food_pantries", uid);
+        const docSnap = await getDoc(docRef);
+  
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          const subscribers: string[] = data.subscribers;
+          const pantryName: string = data.name;
+  
+          const response = await fetch("/api/twilioScheduleMessage", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ subscribers, pantryName, message, scheduledTime, uid }),
+          });
+  
+          const result = await response.json();
+  
+          if (response.ok) {
+            setSnackbarMessage(`Message Scheduled Successfully: ${message}`);
+            setSnackbarSeverity("success");
+          } else {
+            setSnackbarMessage(`Error: ${result.error}`);
+            setSnackbarSeverity("error");
+          }
+  
+          setOpenSnackbar(true);
+          setMessage("");
+        }
+      }
+    } catch (error) {
+      setSnackbarMessage(`An error occurred while trying to send the message.`);
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
+    }
+  }
 
   if (loading) return <CircularProgress sx={{ display: "block", mx: "auto", my: 4 }} />;
 
@@ -156,9 +208,15 @@ export default function DashboardPage() {
             onChange={(e) => setMessage(e.target.value)}
             sx={{ mb: 2 }}
           />
-          <Button type="submit" variant="contained" color="primary">
-            Send Message
-          </Button>
+          <div style={{ display: 'flex'}}>
+            <Button type="submit" variant="contained" color="primary" style={{ marginRight: 20}}>
+              Send Message
+            </Button>
+
+            <Button variant="outlined" color="secondary" onClick={handleOpenScheduleDialog}>
+              Schedule Message
+            </Button>
+          </div>
         </form>
       </Paper>
 
@@ -194,6 +252,60 @@ export default function DashboardPage() {
           </Button>
         </form>
       </Paper>
+
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <Dialog open={scheduleDialogOpen} onClose={() => {
+          handleScheduleMessageSubmit();
+          setScheduleDialogOpen(false)
+          }}>
+          <DialogTitle>Schedule Message</DialogTitle>
+            <DialogContent>
+              <DateTimePicker
+                value={scheduledTime}
+                onChange={(newValue) => {
+                  setScheduleError("");
+                  setScheduledTime(newValue);
+                }}
+                minDateTime={new Date(Date.now() + 5 * 60 * 1000)} // 5 minutes from now
+                maxDateTime={new Date(Date.now() + 35 * 24 * 60 * 60 * 1000)} // 35 days from now
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    error: Boolean(scheduleError),
+                    helperText: scheduleError || "Select a time between 5 minutes and 35 days from now.",
+                    sx: { mt: 2 },
+                  },
+                }}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setScheduleDialogOpen(false)}>Cancel</Button>
+              <Button onClick={async () => {
+                if (!scheduledTime) return;
+
+                // If the scheduled time is nearer than 5 min or farther than 35 days, prompt again
+                const now = new Date();
+                const minTime = new Date(now.getTime() + 5 * 60 * 1000); // 5 minutes
+                const maxTime = new Date(now.getTime() + 35 * 24 * 60 * 60 * 1000); // 35 days
+
+                if (scheduledTime < minTime) {
+                  setScheduleError("Scheduled time must be at least 5 minutes from now.");
+                  return;
+                }
+
+                if (scheduledTime > maxTime) {
+                  setScheduleError("Scheduled time cannot be more than 35 days ahead.");
+                  return;
+                }
+              
+
+                // TODO: functionality
+              }} variant="contained" color="primary">
+                Schedule
+              </Button>
+            </DialogActions>
+        </Dialog>
+      </LocalizationProvider>
 
       {/* Snackbar Notifications */}
       <Snackbar open={openSnackbar} autoHideDuration={4000} onClose={() => setOpenSnackbar(false)}>
