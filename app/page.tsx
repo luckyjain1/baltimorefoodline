@@ -24,7 +24,7 @@ export default function HomePage() {
               Find a Food Pantry Near You
             </Typography>
             <Typography variant="h6" color="text.secondary" paragraph>
-              Text your zipcode to XXX-XXX-XXXX to get real-time updates from food pantries near you{/*, or HELP for instructions 
+              Text your zipcode to 888-568-9942 to get real-time updates from food pantries near you{/*, or HELP for instructions 
               on subscribing to real-time updates about food resources in your area*/}!
             </Typography>
             <Button 
