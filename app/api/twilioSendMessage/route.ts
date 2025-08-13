@@ -34,6 +34,7 @@ export async function POST(req: Request) {
           parameters: {
             "message": body,
             "subscription_id": uid,
+            "scheduled": false
           },
           to: number,
         })
