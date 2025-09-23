@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, JSX } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { auth, db } from "@/utils/firebase";
 import { onAuthStateChanged, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import EditableProfileInformation from "@/components/EditableProfileInformation";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { Container, Typography, TextField, Button, Paper, Grid, Snackbar, Alert, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FilledTextFieldProps, OutlinedTextFieldProps, StandardTextFieldProps, TextFieldVariants } from "@mui/material";
+import { Container, Typography, TextField, Button, Paper, Grid, Snackbar, Alert, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 import { DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
@@ -102,7 +102,7 @@ export default function DashboardPage() {
           setMessage("");
         }
       }
-    } catch (error) {
+    } catch (_error) {
       setSnackbarMessage(`An error occurred while trying to send the message.`);
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
@@ -172,7 +172,7 @@ export default function DashboardPage() {
           setMessage("");
         }
       }
-    } catch (error) {
+    } catch (_error) {
       setSnackbarMessage(`An error occurred while trying to send the message.`);
       setSnackbarSeverity("error");
       setOpenSnackbar(true);

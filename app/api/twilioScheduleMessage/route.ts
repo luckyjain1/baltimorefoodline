@@ -47,8 +47,14 @@ export async function POST(req: Request) {
     
 
     return NextResponse.json({ success: true, message: "Messages sent successfully!" }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Twilio Error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  
+    let message = "Unknown error";
+    if (error instanceof Error) {
+      message = error.message;
+    }
+  
+    return NextResponse.json({ error: message }, { status: 500 });
+  }  
 }
