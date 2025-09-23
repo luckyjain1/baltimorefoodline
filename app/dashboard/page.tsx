@@ -102,7 +102,8 @@ export default function DashboardPage() {
           setMessage("");
         }
       }
-    } catch (_error) {
+    } catch (error) {
+      console.error("Send message failed:", error);
       setSnackbarMessage(`An error occurred while trying to send the message.`);
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
@@ -172,8 +173,9 @@ export default function DashboardPage() {
           setMessage("");
         }
       }
-    } catch (_error) {
-      setSnackbarMessage(`An error occurred while trying to send the message.`);
+    } catch (error) {
+      console.error("Send message failed:", error);
+      setSnackbarMessage("An error occurred while trying to send the message.");
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
     }
