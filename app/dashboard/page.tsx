@@ -15,7 +15,7 @@ export default function DashboardPage() {
   const [name, setName] = useState("");
   const [hours, setHours] = useState("");
   const [address, setAddress] = useState("");
-  const [otherInfo, setOtherInfo] = useState("");
+  const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -42,7 +42,7 @@ export default function DashboardPage() {
           setName(data.name);
           setHours(data.hours);
           setAddress(data.address);
-          setOtherInfo(data.other);
+          setPhone(data.phone);
         }
       } else {
         router.push("/login");
@@ -194,7 +194,7 @@ export default function DashboardPage() {
         <Typography variant="h5" fontWeight="bold" gutterBottom>Profile Information</Typography>
         <EditableProfileInformation info={hours} setInfo={setHours} onSubmit={(val) => handleUpdate("hours", val)} />
         <EditableProfileInformation info={address} setInfo={setAddress} onSubmit={(val) => handleUpdate("address", val)} />
-        <EditableProfileInformation info={otherInfo} setInfo={setOtherInfo} onSubmit={(val) => handleUpdate("other", val)} />
+        <EditableProfileInformation info={phone} setInfo={setPhone} onSubmit={(val) => handleUpdate("phone", val)} />
       </Paper>
 
       {/* Send Message Section */}
