@@ -9,7 +9,7 @@ export default function DatabasePage() {
     id: string;
     name: string;
     address: string;
-    info: string;
+    hours: string;
     phone: string;
   };
 
@@ -110,7 +110,7 @@ export default function DatabasePage() {
               <TableRow sx={{ bgcolor: "primary.main" }}>
                 <TableCell sx={{ color: "white", fontWeight: "bold" }}>Name</TableCell>
                 <TableCell sx={{ color: "white", fontWeight: "bold" }}>Address</TableCell>
-                <TableCell sx={{ color: "white", fontWeight: "bold" }}>Info</TableCell>
+                <TableCell sx={{ color: "white", fontWeight: "bold" }}>Hours</TableCell>
                 <TableCell sx={{ color: "white", fontWeight: "bold" }}>Phone</TableCell>
               </TableRow>
             </TableHead>
@@ -119,7 +119,7 @@ export default function DatabasePage() {
                 <TableRow key={pantry.id}>
                   <TableCell>{pantry.name || "N/A"}</TableCell>
                   <TableCell>{pantry.address || "N/A"}</TableCell>
-                  <TableCell>{pantry.info || "N/A"}</TableCell>
+                  <TableCell>{pantry.hours || "N/A"}</TableCell>
                   <TableCell>{pantry.phone || "N/A"}</TableCell>
                 </TableRow>
               ))}

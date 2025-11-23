@@ -13,7 +13,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 export default function DashboardPage() {
   const [uid, setUID] = useState("");
   const [name, setName] = useState("");
-  const [info, setInfo] = useState("");
+  const [hours, setHours] = useState("");
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
@@ -40,7 +40,7 @@ export default function DashboardPage() {
         if (docSnap.exists()) {
           const data = docSnap.data();
           setName(data.name);
-          setInfo(data.info);
+          setHours(data.hours);
           setAddress(data.address);
           setPhone(data.phone);
         }
@@ -192,7 +192,7 @@ export default function DashboardPage() {
       {/* Profile Update Section */}
       <Paper sx={{ p: 4, my: 3 }}>
         <Typography variant="h5" fontWeight="bold" gutterBottom>Profile Information</Typography>
-        <EditableProfileInformation info={info} setInfo={setInfo} onSubmit={(val) => handleUpdate("info", val)} />
+        <EditableProfileInformation info={hours} setInfo={setHours} onSubmit={(val) => handleUpdate("hours", val)} />
         <EditableProfileInformation info={address} setInfo={setAddress} onSubmit={(val) => handleUpdate("address", val)} />
         <EditableProfileInformation info={phone} setInfo={setPhone} onSubmit={(val) => handleUpdate("phone", val)} />
       </Paper>
